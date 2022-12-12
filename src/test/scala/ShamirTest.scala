@@ -49,7 +49,18 @@ class ShamirTest extends AnyFlatSpec with should.Matchers {
 
     scheme.decrypt(shares.take(6)) shouldBe secret
     scheme.decrypt(shares.takeRight(6)) shouldBe secret
+  }
+
+  it should "not decrypt secret using incorrect shares" in {
+    val scheme = Shamir()
+
+    val (secret, shares) = scheme.createSecretAndShares(7, 3)
+
+    val thirdShare = shares(2)
+    val thirdShareIncorrect = (thirdShare._1, thirdShare._2 + 1)
 
     scheme.decrypt(shares.take(2)) should not be secret
+    scheme.decrypt(shares.takeRight(2)) should not be secret
+    scheme.decrypt(shares.take(2) :+ thirdShareIncorrect) should not be secret
   }
 }

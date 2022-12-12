@@ -59,4 +59,17 @@ class BlakleyTest extends AnyFlatSpec with should.Matchers {
 
     scheme.decrypt(shares.take(2)) should not be secret
   }
+
+  it should "not decrypt secret using incorrect shares" in {
+    val scheme = Blakley()
+
+    val (secret, shares) = scheme.createSecretAndShares(6, 3)
+
+    val thirdShare = shares(2)
+    val thirdShareIncorrect = thirdShare.init :+ thirdShare.head
+
+    scheme.decrypt(shares.take(2)) should not be secret
+    scheme.decrypt(shares.takeRight(2)) should not be secret
+    scheme.decrypt(shares.take(2) :+ thirdShareIncorrect) should not be secret
+  }
 }

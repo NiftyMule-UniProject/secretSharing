@@ -42,9 +42,18 @@ class CRTSpec extends AnyFlatSpec with should.Matchers {
     scheme.decrypt(shares.take(3)) shouldBe secret
     scheme.decrypt(shares.takeRight(3)) shouldBe secret
     scheme.decrypt(List(1, 4, 5).map(shares)) shouldBe secret
+  }
 
-    // insufficient shares
+  it should "not decrypt secret using incorrect shares" in {
+    val scheme = CRT()
+
+    val (secret, shares) = scheme.createSecretAndShares(7, 3)
+
+    val thirdShare = shares(2)
+    val thirdShareIncorrect = (thirdShare._1, thirdShare._2 + 1)
+
     scheme.decrypt(shares.take(2)) should not be secret
     scheme.decrypt(shares.takeRight(2)) should not be secret
+    scheme.decrypt(shares.take(2) :+ thirdShareIncorrect) should not be secret
   }
 }
